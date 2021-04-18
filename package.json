@@ -1,0 +1,19 @@
+{
+  "name": "discord-rss-bot",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node-fetch": "^2.5.10",
+    "date-fns": "^2.21.1",
+    "dotenv": "^8.2.0",
+    "node-fetch": "^2.6.1",
+    "rss-parser": "^3.12.0",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
+  }
+}
