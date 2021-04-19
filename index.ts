@@ -14,7 +14,7 @@ const getRSS = async (url) => {
     const parser = new Parser();
     const feed = await parser.parseURL(url);
 
-    return feed.items;
+    return feed;
 }
 
 
@@ -46,14 +46,14 @@ const writeLastCheckFile = () => writeFileSync('lastcheck', '');
 
     for (const url of FEED_URLS) {
         console.log(`[${new Date()}] fetching ${url}`)
-        const items = await getRSS(url);
+        const { items, title } = await getRSS(url);
         const newItems = items.filter(item => isBefore(lastCheck, new Date(item.pubDate)));
-        newItems.forEach(item => post(`${item.title} ${item.link}`));
+        newItems.forEach(item => post(`[${title}] ${item.title} ${item.link}`));
 
         if (newItems.length > 0) {
-            console.log(`[${new Date()}] Posted ${newItems.length} new articles from ${url}`);
+            console.log(`[${new Date()}] [${title}] Posted ${newItems.length} new articles`);
         } else {
-            console.log(`[${new Date()}] No new articles to post from ${url}`);
+            console.log(`[${new Date()}] [${title}] No new articles to post from ${title}`);
         }
     }
 
