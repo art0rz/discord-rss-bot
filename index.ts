@@ -48,7 +48,7 @@ const writeLastCheckFile = () => writeFileSync('lastcheck', '');
         console.log(`[${new Date()}] fetching ${url}`)
         const items = await getRSS(url);
         const newItems = items.filter(item => isBefore(lastCheck, new Date(item.pubDate)));
-        newItems.forEach(item => post(`${item.title} ${item.guid}`));
+        newItems.forEach(item => post(`${item.title} ${item.guid || item.link}`));
 
         if (newItems.length > 0) {
             console.log(`[${new Date()}] Posted ${newItems.length} new articles from ${url}`);
