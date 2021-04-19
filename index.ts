@@ -6,15 +6,13 @@ import {isBefore, fromUnixTime} from 'date-fns';
 
 import {statSync, writeFileSync} from 'fs';
 
-const FEED_URL = process.env.FEED_URL;
+const FEED_URLS = process.env.FEED_URLS.split(',');
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
 const LASTCHECK_FILE = 'lastcheck';
 
-const getRSS = async () => {
-    await (await fetch(FEED_URL)).text();
-
+const getRSS = async (url) => {
     const parser = new Parser();
-    const feed = await parser.parseURL(FEED_URL);
+    const feed = await parser.parseURL(url);
 
     return feed.items;
 }
@@ -44,16 +42,19 @@ const getTimeOfLastCheck = () => {
 const writeLastCheckFile = () => writeFileSync('lastcheck', '');
 
 (async () => {
-    const items = await getRSS();
-
     const lastCheck = getTimeOfLastCheck();
-    const newItems = items.filter(item => isBefore(lastCheck, new Date(item.pubDate)));
-    newItems.forEach(item => post(`${item.title} ${item.guid}`));
 
-    if (newItems.length > 0) {
-        console.log(`Posted ${newItems.length} new articles`);
-    } else {
-        console.log('No new articles to post')
+    for (const url of FEED_URLS) {
+        console.log(`[${new Date()}] fetching ${url}`)
+        const items = await getRSS(url);
+        const newItems = items.filter(item => isBefore(lastCheck, new Date(item.pubDate)));
+        newItems.forEach(item => post(`${item.title} ${item.guid}`));
+
+        if (newItems.length > 0) {
+            console.log(`[${new Date()}] Posted ${newItems.length} new articles from ${url}`);
+        } else {
+            console.log(`[${new Date()}] No new articles to post from ${url}`);
+        }
     }
 
     writeLastCheckFile();
